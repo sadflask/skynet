@@ -1,0 +1,9 @@
+{
+
+  "name": "skynet",
+  "version": "1.0.0",
+  "description": "Die humans die",
+  "main": "skynet.js",
+  "author": "sadflask",
+  "dependencies": {}
+}
