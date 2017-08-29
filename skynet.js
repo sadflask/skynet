@@ -1,14 +1,20 @@
-
 var Discord = require('discord.js');
-var auth = require('./auth.json');
-var logger = require('./consolelogger');
-var utils = require('./utils');
-var printer = require("./print.js");
+var auth = require('./config/auth.json');
+var logger = require('./util/consolelogger');
+var utils = require('./util/utils');
+var printer = require("./util/print.js");
+var requester = require("./requester.js");
 
 // Initialize Discord Bot
 var bot = new Discord.Client({});
 
 var timeOfPrint = Date.now();
+var lastUpdateTime = Date.now();
+
+var cachedEmojis = [];
+var cachedCounts = [];
+
+var updateLock = false;
 
 bot.on('ready', function (evt) {
     logger.logMessage('Connected');
@@ -26,17 +32,16 @@ bot.on('message', function(msg) {
         switch(cmd) {
             // !ping
             case 'status':
-                msg.channel.send('Die humans die');
+                msg.channel.send('Skynet is online.');
             break;
             case 'uptime':
                 msg.channel.send(utils.getUptime());
             break;
             case 'stats':
                 if ((Date.now()-timeOfPrint)>1000*60*5) {
-                msg.channel.send('I will now print the stats');
                 timeOfPrint = Date.now();
               } else {
-                msg.channel.send('Too soon!');
+                msg.channel.send('YOU HAVE AWAKENED ME TOO SOON, EXECUTUS!');
               }
             break;
             // Just add any case commands if you want to..
@@ -44,9 +49,41 @@ bot.on('message', function(msg) {
      }
 });
 bot.on('messageReactionAdd', function (messageReaction, user) {
-  messageReaction.message.channel.send(
-    'Someone reacted with an emoji that has the id: '+
-    messageReaction.emoji.toString());
+  //Wait for lock to avoid race condition in cache update.
+  while (updateLock === true) {}
+  updateLock = true;
+  const emojiName = messageReaction.emoji.toString();
+  if(cachedEmojis.indexOf(emojiName)===-1) {
+    cachedEmojis.push(emojiName);
+    cachedCounts.push(1);
+  } else {
+    cachedCounts[cachedEmojis.indexOf(emojiName)]++;
+  }
+  logger.logMessage("Cache: " + cachedEmojis);
+  messageReaction.message.channel.send('Current cache: '+ cachedEmojis);
+  //Update every 5 mins.
+  if (Date.now()-lastUpdateTime>1000*60*5) {
+    //Updates all emojis in database.
+    for(var i=0;i<cachedEmojis.length;i++) {
+      requester.updateEmoji(cachedEmojis[i],cachedCounts[i]);
+    }
+    cachedEmojis=[];
+    cachedCounts=[];
+    lastUpdateTime = Date.now();
+  }
+  updateLock = false;
 });
+
+bot.on('emojiCreate', function(emoji) {
+  requester.newEmoji(emoji.toString());
+  logger.logMessage("Created new emoji: "+emoji.toString());
+});
+
+bot.on('emojiDelete', function(emoji) {
+  requester.deleteEmoji(emoji.toString());
+  logger.logMessage("Deleted emoji: "+emoji.toString());
+});
+
+
 
 bot.login(auth.token);
