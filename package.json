@@ -1,9 +1,14 @@
 {
-
   "name": "skynet",
   "version": "1.0.0",
   "description": "Die humans die",
   "main": "skynet.js",
   "author": "sadflask",
-  "dependencies": {}
+  "dependencies": {
+    "circular-json": "^0.3.3",
+    "discord.js": "^11.1.0",
+    "mongodb": "^2.2.31",
+    "querystring": "^0.2.0",
+    "request": "^2.81.0"
+  }
 }
