@@ -59,10 +59,11 @@ bot.on('messageReactionAdd', function (messageReaction, user) {
   } else {
     cachedCounts[cachedEmojis.indexOf(emojiName)]++;
   }
-  logger.logMessage("Cache: " + cachedEmojis);
+  logger.logMessage("Cache: " + cachedEmojis+'\n' +"Counts: "+cachedCounts);
   messageReaction.message.channel.send('Current cache: '+ cachedEmojis);
+  messageReaction.message.channel.send('Current counts: '+ cachedCounts);
   //Update every 5 mins.
-  if (Date.now()-lastUpdateTime>1000*60*5) {
+  if (Date.now()-lastUpdateTime>1000*30) {
     //Updates all emojis in database.
     for(var i=0;i<cachedEmojis.length;i++) {
       requester.updateEmoji(cachedEmojis[i],cachedCounts[i]);
