@@ -17,9 +17,9 @@ exports.setApp = function(app) {
 	});
 
 //Function to get by emoji
-	app.get('/api/reactions/:emoji', function(req, res) {
+	app.get('/api/reactions/:emojiName', function(req, res) {
 		ConsoleLogger.logRequest(req);
-		reactionModel.find({emoji: req.params.emoji}).exec(function(err, reaction) {
+		reactionModel.find({emoji: req.params.emojiName}).exec(function(err, reaction) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
@@ -56,10 +56,10 @@ exports.setApp = function(app) {
 		});
 	});
 
-	app.put('/api/reactions/:emoji', function(req, res) {
+	app.put('/api/reactions/:emojiName', function(req, res) {
 		ConsoleLogger.logRequest(req);
 
-		reactionModel.find({emoji: req.params.emoji}).exec( function(err, reaction) {
+		reactionModel.find({emoji: req.params.emojiName}).exec( function(err, reaction) {
 			if (err) {
 				res.send(err);
 			}
@@ -73,7 +73,7 @@ exports.setApp = function(app) {
 					ConsoleLogger.logError(err);
 					res.send({ error: err });
 				} else {
-					reactionModel.find({emoji: req.params.emoji}).exec( function(err, reaction) {
+					reactionModel.find({emoji: req.params.emojiName}).exec( function(err, reaction) {
 						res.send({ reaction: reaction });
 					});
 				}
@@ -81,9 +81,9 @@ exports.setApp = function(app) {
 		});
 	});
 
-	app.delete('/api/reaction/:emoji', function(req, res) {
+	app.delete('/api/reactions/:emojiName', function(req, res) {
 		ConsoleLogger.logRequest(req);
-		reactionModel.remove({emoji: req.params.emoji}, function(err) {
+		reactionModel.remove({emoji: req.params.emojiName}, function(err) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
