@@ -4,6 +4,7 @@ var logger = require('./util/consolelogger');
 var utils = require('./util/utils');
 var printer = require("./util/print.js");
 var requester = require("./requester.js");
+var sorter = require('./util/sorting.js');
 
 // Initialize Discord Bot
 var bot = new Discord.Client({});
@@ -38,12 +39,16 @@ bot.on('message', function(msg) {
                 msg.channel.send(utils.getUptime());
             break;
             case 'stats':
-                if ((Date.now()-timeOfPrint)>1000*60*5) {
+              if ((Date.now()-timeOfPrint)>1000*5) {
+                requester.getAndPrint(printer.printStats, sorter,msg.channel);
                 timeOfPrint = Date.now();
               } else {
                 msg.channel.send('YOU HAVE AWAKENED ME TOO SOON, EXECUTUS!');
               }
             break;
+            case 'clear':
+            requester.delete();
+              break;
             // Just add any case commands if you want to..
          }
      }
@@ -62,7 +67,7 @@ bot.on('messageReactionAdd', function (messageReaction, user) {
   logger.logMessage("Cache: " + cachedEmojis+'\n' +"Counts: "+cachedCounts);
   messageReaction.message.channel.send('Current cache: '+ cachedEmojis);
   messageReaction.message.channel.send('Current counts: '+ cachedCounts);
-  //Update every 5 mins.
+  //Update every 30 seconds.
   if (Date.now()-lastUpdateTime>1000*30) {
     //Updates all emojis in database.
     for(var i=0;i<cachedEmojis.length;i++) {
