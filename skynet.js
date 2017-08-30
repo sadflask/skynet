@@ -59,7 +59,7 @@ bot.on('message', function(msg) {
               }
             break;
             case 'clear':
-            requester.delete();
+            requester.deleteAll();
               break;
             // Just add any case commands if you want to..
          }
