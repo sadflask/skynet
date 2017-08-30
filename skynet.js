@@ -15,12 +15,24 @@ var lastUpdateTime = Date.now();
 var cachedEmojis = [];
 var cachedCounts = [];
 
+//Separate lists to save relationship between emojis and their ids
+var allEmojis = [];
+var emojiIds = [];
+
 var updateLock = false;
 
 bot.on('ready', function (evt) {
     logger.logMessage('Connected');
     logger.logMessage('Logged in as: '+bot.user.username + ' - (' + bot.user.id + ')');
-
+    requester.getAll(function(err, res, body) { //Instantiate id list.
+      var reactions = JSON.parse(body).rows;
+      for(var i=0;i<reactions.length;i++) {
+        if (allEmojis.indexOf(reactions[i].emoji)===-1) { //If the emoji is not in the list, find it's id
+          emojiIds[i] = reactions[i]._id.$oid;
+        }
+      }
+      logger.logMessage("Id list: "+emojiIds);
+    });
 });
 bot.on('message', function(msg) {
     // Our bot needs to know if it will execute a command
@@ -53,6 +65,9 @@ bot.on('message', function(msg) {
          }
      }
 });
+
+//Adds a new messageReaction to the cache, updates cache to db if enough time has passed.
+//Listens for the messageReactionAdd event.
 bot.on('messageReactionAdd', function (messageReaction, user) {
   //Wait for lock to avoid race condition in cache update.
   while (updateLock === true) {}
@@ -64,15 +79,28 @@ bot.on('messageReactionAdd', function (messageReaction, user) {
   } else {
     cachedCounts[cachedEmojis.indexOf(emojiName)]++;
   }
-  logger.logMessage("Cache: " + cachedEmojis+'\n' +"Counts: "+cachedCounts);
-  messageReaction.message.channel.send('Current cache: '+ cachedEmojis);
-  messageReaction.message.channel.send('Current counts: '+ cachedCounts);
+  //Log cache
+  messageReaction.message.channel.send('Current cache: '+ cachedEmojis+" , "+'Current counts: '+ cachedCounts);
   //Update every 30 seconds.
   if (Date.now()-lastUpdateTime>1000*30) {
     //Updates all emojis in database.
     for(var i=0;i<cachedEmojis.length;i++) {
-      requester.updateEmoji(cachedEmojis[i],cachedCounts[i]);
+      if(allEmojis.indexOf(cachedEmojis[i])===-1) { //If the emoji does not exist already, create it.
+        requester.newEmoji(cachedEmojis[i]);
+      }
     }
+    //Get all emojis and update the ids
+    requester.getAll(function(err, res, body) {
+      var reactions = JSON.parse(body).rows;
+      for(var i=0;i<reactions.length;i++) {
+        if (allEmojis.indexOf(reactions[i].emoji)===-1) { //If the emoji is not in the list, find it's id
+          emojiIds[i] = reactions[i].id;
+        }
+      }
+      for(var i=0;i<cachedEmojis.length;i++) {
+        requester.updateEmoji(emojiIds[allEmojis.indexOf(cachedEmojis[i])],cachedCounts[i]);
+      }
+    });
     cachedEmojis=[];
     cachedCounts=[];
     lastUpdateTime = Date.now();
@@ -80,16 +108,17 @@ bot.on('messageReactionAdd', function (messageReaction, user) {
   updateLock = false;
 });
 
+//Insert a new emoji when the emojiCreate event is fired
 bot.on('emojiCreate', function(emoji) {
   requester.newEmoji(emoji.toString());
   logger.logMessage("Created new emoji: "+emoji.toString());
 });
 
+//Delete an emoji when the emojiDelete event is fired
 bot.on('emojiDelete', function(emoji) {
+  //Find id to delete by and pass to deleteEmoji
   requester.deleteEmoji(emoji.toString());
   logger.logMessage("Deleted emoji: "+emoji.toString());
 });
-
-
 
 bot.login(auth.token);
