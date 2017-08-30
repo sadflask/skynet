@@ -17,9 +17,9 @@ exports.setApp = function(app) {
 	});
 
 //Function to get by emoji
-	app.get('/api/reactions/:emojiName', function(req, res) {
+	app.get('/api/reactions/:id', function(req, res) {
 		ConsoleLogger.logRequest(req);
-		reactionModel.find({emoji: req.params.emojiName}).exec(function(err, reaction) {
+		reactionModel.findById(req.params.id).exec(function(err, reaction) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
@@ -39,27 +39,20 @@ exports.setApp = function(app) {
 		reaction.thisWeek = 0;
 		reaction.lastWeek = 0;
 
-		reaction.save(function(err) {
+		reaction.save(function(err,reaction) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
 			} else {
-				reactionModel.findById(reaction._id).exec( function(err, resolvedReaction) {
-					if (err) {
-						ConsoleLogger.logError(err);
-						res.send({ error: err });
-					} else {
-						res.send({ reaction: resolvedReaction });
-					}
-				});
+				res.send({ id: reaction.id });
 			}
 		});
 	});
 
-	app.put('/api/reactions/:emojiName', function(req, res) {
+	app.put('/api/reactions/:id', function(req, res) {
 		ConsoleLogger.logRequest(req);
 
-		reactionModel.find({emoji: req.params.emojiName}).exec( function(err, reaction) {
+		reactionModel.findById(req.params.id).exec( function(err, reaction) {
 			if (err) {
 				res.send(err);
 			}
@@ -73,7 +66,7 @@ exports.setApp = function(app) {
 					ConsoleLogger.logError(err);
 					res.send({ error: err });
 				} else {
-					reactionModel.find({emoji: req.params.emojiName}).exec( function(err, reaction) {
+					reactionModel.findById(req.params.id).exec( function(err, reaction) {
 						res.send({ reaction: reaction });
 					});
 				}
@@ -81,9 +74,9 @@ exports.setApp = function(app) {
 		});
 	});
 
-	app.delete('/api/reactions/:emojiName', function(req, res) {
+	app.delete('/api/reactions/:id', function(req, res) {
 		ConsoleLogger.logRequest(req);
-		reactionModel.remove({emoji: req.params.emojiName}, function(err) {
+		reactionModel.remove(req.params.id, function(err) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
