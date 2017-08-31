@@ -19,7 +19,7 @@ exports.setApp = function(app) {
 //Function to get by emoji
 	app.get('/api/reactions/:emojiName', function(req, res) {
 		ConsoleLogger.logRequest(req);
-		reactionModel.find({emoji: req.params.emojiName}).exec(function(err, reaction) {
+		reactionModel.findOne({emoji: req.params.emojiName}).exec(function(err, reaction) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
@@ -56,7 +56,6 @@ exports.setApp = function(app) {
 			if (err) {
 				res.send(err);
 			}
-			ConsoleLogger.logMessage("reaction: "+reaction);
 			reaction.emoji = req.body.emoji;
 			reaction.total = req.body.total;
 			reaction.thisWeek = req.body.thisWeek;
