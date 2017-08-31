@@ -1,20 +1,20 @@
 var request = require('request');
 var querystring = require("querystring");
 var logger = require('./util/consolelogger');
+var emoji = require('node-emoji');
 
 //Query the db for this emoji, uses GET request
-getById = function(emojiId, callback) {
+getByName = function(emojiName, callback) {
   const options = {
-    url: 'http://localhost:28017/api/reactions/'+emojiId
+    url: 'http://localhost:4500/api/reactions/'+emojiName
   };
-  logger.logMessage('URL to GET: '+options.url);
   const req = request.get(options, callback);
 }
 
 //Called to increment emoji, uses PUT request
-putById = function (reaction) {
+putByName = function (reaction) {
   const options = {
-    url: 'http://localhost:28017/api/reactions/'+reaction.id,
+    url: 'http://localhost:4500/api/reactions/'+reaction.emoji,
     body: {
       emoji: reaction.emoji,
       lastWeek: reaction.lastWeek,
@@ -33,7 +33,7 @@ putById = function (reaction) {
 //Does a general get call on db then executes callback
 exports.getAll = function(callback) {
   const options = {
-    url: 'http://localhost:28017/api/reactions/'
+    url: 'http://localhost:4500/api/reactions/'
   };
   const req = request.get(options, callback);
 }
@@ -43,10 +43,11 @@ exports.getAndPrint = function(printStats, sorter, channel) {
   exports.getAll(function (error, response, body) {
     if (error) {logger.logError(error);} // Print the error if one occurred
     logger.logMessage(response && response.statusCode); // Print the response status code if a response was received
-    var rows =JSON.parse(body).rows; // Extract the rows from the body
-    var totalArray = rows.slice(0);
-    var weeklyArray = rows.slice(0);
-    var changeArray = rows.slice(0); //Slice the array (effectively make 3 copies)
+    logger.logObj(JSON.parse(body));
+    var reactions = JSON.parse(body).reactions; // Extract the rows from the body
+    var totalArray = reactions.slice(0);
+    var weeklyArray = reactions.slice(0);
+    var changeArray = reactions.slice(0); //Slice the array (effectively make 3 copies)
     totalArray = sorter.sort(totalArray, sorter.compareAllTime);
     weeklyArray = sorter.sort(weeklyArray, sorter.compareWeekly);
     changeArray = sorter.sort(changeArray, sorter.compareChange);
@@ -54,17 +55,36 @@ exports.getAndPrint = function(printStats, sorter, channel) {
   });
 }
 
-//Updates the emoji in the db with value of increment using getById and putById
-exports.updateEmoji = function (emojiId, increment) {
-  getById(emojiId, function(err, res, body) {
-    console.log(body);
-    reaction = {
-      total: body.total += increment,
-      thisWeek: body.thisWeek += increment,
-      lastWeek: body.lastWeek,
-      emoji: body.emoji,
+//Updates the emoji in the db with value of increment using getByName and putByName
+exports.updateEmoji = function (emojiName, increment) {
+  logger.logMessage('Updating: '+emojiName+' by: '+ increment);
+  getByName(emojiName, function(err, res, body) {
+    var reaction = JSON.parse(body).reaction;
+    logger.logObj(JSON.parse(body));
+    logger.logMessage('Reaction: '+reaction);
+    if (reaction==null) {
+      //No existing emoji, insert a new one
+      logger.logMessage("Reaction does not exist, creating in DB");
+      exports.newEmoji(emojiName, function(err, res, body) {
+        reaction = body.reaction;
+        reaction = {
+          total: reaction.total += increment ,
+          thisWeek: reaction.thisWeek += increment,
+          lastWeek: reaction.lastWeek,
+          emoji: reaction.emoji,
+        }
+        putByName(reaction);
+      });
+    } else {
+      logger.logMessage('Reaction exists, updating DB');
+      reaction = {
+        total: reaction.total += increment ,
+        thisWeek: reaction.thisWeek += increment,
+        lastWeek: reaction.lastWeek,
+        emoji: reaction.emoji,
+      }
+      putByName(reaction);
     }
-    putByEmoji(reaction);
   });
 
 }
@@ -72,7 +92,7 @@ exports.updateEmoji = function (emojiId, increment) {
 //Triggered by adding a new emoji, adds it to the db using POST
 exports.newEmoji = function (emojiName, callback) {
   const options = {
-    url: 'http://localhost:28017/api/reactions/',
+    url: 'http://localhost:4500/api/reactions/',
     body: {emoji:emojiName},
     json: true
   };
@@ -82,7 +102,7 @@ exports.newEmoji = function (emojiName, callback) {
 //Removes a reaction from the db using DELETE.
 exports.deleteEmoji = function (emojiName, callback) {
   const options = {
-    url: 'http://localhost:28017/api/reactions/'+emojiName,
+    url: 'http://localhost:4500/api/reactions/'+emojiName,
     json: true
   };
   const req = request.delete(options, callback);
@@ -90,7 +110,7 @@ exports.deleteEmoji = function (emojiName, callback) {
 
 exports.deleteAll = function () {
   const options = {
-    url: 'http://localhost:28017/api/reactions/',
+    url: 'http://localhost:4500/api/reactions/',
     json: true
   };
   const req = request.delete(options, function (error, response, body) {
