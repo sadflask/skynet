@@ -6,20 +6,20 @@ exports.setApp = function(app) {
 
 	app.get('/api/reactions', function(req, res) {
 		ConsoleLogger.logRequest(req);
-		reactionModel.find(req.query).exec(function(err, reaction) {
+		reactionModel.find({}, function(err, reactions) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
 			} else {
-				res.send({ reaction: reaction });
+				res.send({ reactions: reactions });
 			}
 		});
 	});
 
 //Function to get by emoji
-	app.get('/api/reactions/:id', function(req, res) {
+	app.get('/api/reactions/:emojiName', function(req, res) {
 		ConsoleLogger.logRequest(req);
-		reactionModel.findById(req.params.id).exec(function(err, reaction) {
+		reactionModel.find({emoji: req.params.emojiName}).exec(function(err, reaction) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
@@ -44,18 +44,19 @@ exports.setApp = function(app) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
 			} else {
-				res.send({ id: reaction.id });
+				res.send({ reaction: reaction });
 			}
 		});
 	});
 
-	app.put('/api/reactions/:id', function(req, res) {
+	app.put('/api/reactions/:emojiName', function(req, res) {
 		ConsoleLogger.logRequest(req);
 
-		reactionModel.findById(req.params.id).exec( function(err, reaction) {
+		reactionModel.findOne({emoji: req.params.emojiName}, function(err, reaction) {
 			if (err) {
 				res.send(err);
 			}
+			ConsoleLogger.logMessage("reaction: "+reaction);
 			reaction.emoji = req.body.emoji;
 			reaction.total = req.body.total;
 			reaction.thisWeek = req.body.thisWeek;
@@ -66,7 +67,7 @@ exports.setApp = function(app) {
 					ConsoleLogger.logError(err);
 					res.send({ error: err });
 				} else {
-					reactionModel.findById(req.params.id).exec( function(err, reaction) {
+					reactionModel.findById(reaction.id).exec( function(err, reaction) {
 						res.send({ reaction: reaction });
 					});
 				}
@@ -74,12 +75,24 @@ exports.setApp = function(app) {
 		});
 	});
 
-	app.delete('/api/reactions/:id', function(req, res) {
+	app.delete('/api/reactions/:emojiName', function(req, res) {
 		ConsoleLogger.logRequest(req);
-		reactionModel.remove(req.params.id, function(err) {
+		reactionModel.remove({emoji: req.params.emojiName}, function(err) {
 			if (err) {
 				ConsoleLogger.logError(err);
 				res.send({ error: err });
+			} else {
+				res.send({});
+			}
+		});
+	});
+
+	app.delete('/api/reactions', function(req,res) {
+		ConsoleLogger.logRequest(req);
+		reactionModel.remove({},function(err) {
+			if (err) {
+				ConsoleLogger.logError(err);
+				res.send({error: err });
 			} else {
 				res.send({});
 			}
