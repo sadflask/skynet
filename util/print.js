@@ -43,15 +43,15 @@ exports.printStats = function(allTime, weekly, changes) {
 
 exports.printAll = function(allTime, weekly) {
   let output="SKYNET BOT STATS (LONG): \n\
-  \n:MOST USED REACTIONS (ALL TIME):\n";
+  \nMOST USED REACTIONS (ALL TIME):\n";
   for(var i=0;i<allTime.length;i+=4) {
     for(var j=i;j<i+4;j++) {
       if(j<allTime.length) {
         curr = allTime[j];
-        output+=" " + curr.emoji  + " [";
+        output+=" " + curr.emoji  + " \`";
         if (curr.total<10) {output+="0";}
         if (curr.total<100) {output+="0";}
-        output+=curr.total+"] ";
+        output+=curr.total+"\` ";
       }
     }
     output+="\n";
@@ -61,15 +61,15 @@ exports.printAll = function(allTime, weekly) {
 
 exports.printWeekly = function(allTime, weekly) {
   let output="SKYNET BOT STATS (LONG): \n\
-  \n:MOST USED REACTIONS (WEEKLY):\n";
+  \nMOST USED REACTIONS (WEEKLY):\n";
   for(var i=0;i<weekly.length;i+=4) {
     for(var j=i;j<i+4;j++) {
       if(j<weekly.length) {
         curr = allTime[j];
-        output+=" " + curr.emoji  + " [";
+        output+=" " + curr.emoji  + " \`";
         if (curr.thisWeek<10) {output+="0";}
         if (curr.thisWeek<100) {output+="0";}
-        output+=curr.thisWeek+"] ";
+        output+=curr.thisWeek+"\` ";
       }
     }
     output+="\n";
