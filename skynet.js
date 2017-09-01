@@ -50,6 +50,12 @@ bot.on('message', function(msg) {
                 msg.channel.send('YOU HAVE AWAKENED ME TOO SOON, EXECUTUS!');
               }
             break;
+            case 'all':
+                requester.getAndPrint(printer.printAll, sorter,msg.channel);
+            break;
+            case 'week':
+                requester.getAndPrint(printer.printWeekly, sorter,msg.channel);
+            break;
             case 'force':
               msg.channel.send('USING THE FORCE, LUKE');
               //Updates all emojis in database.
