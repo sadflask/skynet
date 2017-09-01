@@ -1,7 +1,6 @@
 var request = require('request');
 var querystring = require("querystring");
 var logger = require('./util/consolelogger');
-var emoji = require('node-emoji');
 
 //Query the db for this emoji, uses GET request
 getByName = function(emojiName, callback) {
@@ -123,6 +122,14 @@ exports.deleteAll = function () {
 
 exports.changeWeek = function () {
   //Get all emoji and clear current week
+  exports.getAll(function(err, res, body) {
+    var reactions = JSON.parse(body).reactions;
+    reactions.forEach(function(reaction) {
+      reaction.lastWeek = reaction.thisWeek;
+      reaction.thisWeek = 0;
+      putByName(reaction);
+    });
+  })
   //emoji.lastWeek = emoji.thisWeek & emoji.thisWeek=0;
 
 }

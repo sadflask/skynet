@@ -1,11 +1,12 @@
-var Discord = require('discord.js');
-var auth = require('./config/auth.json');
-var logger = require('./util/consolelogger');
-var utils = require('./util/utils');
-var printer = require("./util/print.js");
-var requester = require("./requester.js");
-var sorter = require('./util/sorting.js');
-var init = require('./util/init.js');
+const Discord = require('discord.js');
+const auth = require('./config/auth.json');
+const logger = require('./util/consolelogger');
+const utils = require('./util/utils');
+const printer = require("./util/print.js");
+const requester = require("./requester.js");
+const sorter = require('./util/sorting.js');
+const init = require('./util/init.js');
+const schedule = require('node-schedule');
 
 // Initialize Discord Bot
 var bot = new Discord.Client({});
@@ -23,6 +24,9 @@ bot.on('ready', function (evt) {
       if (key == '262860303044182019') {
         init.initEmojis(requester, value)
       }
+    });
+    schedule.scheduleJob('30 18 * * 5', function(){
+      requester.changeWeek();
     });
     //init.initEmojis(requester, bot.guilds[0]);
 });
