@@ -5,6 +5,7 @@ var utils = require('./util/utils');
 var printer = require("./util/print.js");
 var requester = require("./requester.js");
 var sorter = require('./util/sorting.js');
+var init = require('./util/init.js');
 
 // Initialize Discord Bot
 var bot = new Discord.Client({});
@@ -18,6 +19,12 @@ var cachedCounts = [];
 bot.on('ready', function (evt) {
     logger.logMessage('Connected');
     logger.logMessage('Logged in as: '+bot.user.username + ' - (' + bot.user.id + ')');
+    bot.guilds.forEach(function(value, key) {
+      if (key == '262860303044182019') {
+        init.initEmojis(requester, value)
+      }
+    });
+    //init.initEmojis(requester, bot.guilds[0]);
 });
 bot.on('message', function(msg) {
     // Our bot needs to know if it will execute a command
@@ -46,12 +53,7 @@ bot.on('message', function(msg) {
             case 'force':
               msg.channel.send('USING THE FORCE, LUKE');
               //Updates all emojis in database.
-              for(var i=0;i<cachedEmojis.length;i++) {
-                  requester.updateEmoji(cachedEmojis[i],cachedCounts[i]);
-              }
-              cachedEmojis=[];
-              cachedCounts=[];
-              lastUpdateTime = Date.now();
+              force();
 
             break;
             // Just add any case commands if you want to..
@@ -79,12 +81,7 @@ bot.on('messageReactionAdd', function (messageReaction, user) {
   //Update every 5 minutes.
   if (Date.now()-lastUpdateTime>1000*60*5) {
     //Updates all emojis in database.
-    for(var i=0;i<cachedEmojis.length;i++) {
-        requester.updateEmoji(cachedEmojis[i],cachedCounts[i]);
-    }
-    cachedEmojis=[];
-    cachedCounts=[];
-    lastUpdateTime = Date.now();
+    force();
   }
 });
 
@@ -101,5 +98,14 @@ bot.on('emojiDelete', function(emoji) {
   requester.deleteEmoji(emoji.toString());
   logger.logMessage("Deleted emoji: "+emoji.toString());
 });
+
+var force = function() {
+  for(var i=0;i<cachedEmojis.length;i++) {
+      requester.updateEmoji(cachedEmojis[i],cachedCounts[i]);
+  }
+  cachedEmojis=[];
+  cachedCounts=[];
+  lastUpdateTime = Date.now();
+}
 
 bot.login(auth.token);
