@@ -30,7 +30,7 @@ exports.compareWeekly = function(reactionA, reactionB) {
 }
 
 exports.compareChange = function(reactionA, reactionB) {
-  if((reactionA.thisWeek-reactionA.lastWeek)<(reactionB.thisWeek-reactionB.lastWeek)) {
+  if(((reactionA.thisWeek-reactionA.lastWeek)/reactionA.lastWeek)<((reactionB.thisWeek-reactionB.lastWeek)/reactionB.lastWeek)) {
     return 1;
   }
   return 0;
