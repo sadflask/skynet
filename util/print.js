@@ -65,7 +65,7 @@ exports.printWeekly = function(allTime, weekly) {
   for(var i=0;i<weekly.length;i+=4) {
     for(var j=i;j<i+4;j++) {
       if(j<weekly.length) {
-        curr = allTime[j];
+        curr = weekly[j];
         output+=" " + curr.emoji  + " \`";
         if (curr.thisWeek<10) {output+="0";}
         if (curr.thisWeek<100) {output+="0";}
