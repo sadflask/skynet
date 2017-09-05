@@ -73,7 +73,7 @@ bot.on('message', function(msg) {
             case 'week':
                 requester.getAndPrint(printer.printWeekly, sorter, msg.channel);
             break;
-            case 'week':
+            case 'change':
                 requester.getAndPrint(printer.printChanges, sorter, msg.channel);
             break;
             case 'force':
