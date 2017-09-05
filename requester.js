@@ -7,6 +7,7 @@ let address = 'http://localhost:4500/api/reactions/';
 exports.setAddress = function(dev) {
   if (dev === true) {
     address = 'http://localhost:4501/api/reactions/';
+    console.log("DEV MODE");
   }
 }
 //Query the db for this emoji, uses GET request
@@ -49,7 +50,6 @@ exports.getAndPrint = function(printStats, sorter, channel) {
   exports.getAll(function (error, response, body) {
     if (error) {logger.logError(error);} // Print the error if one occurred
     logger.logMessage(response && response.statusCode); // Print the response status code if a response was received
-    logger.logObj(JSON.parse(body));
     var reactions = JSON.parse(body).reactions; // Extract the rows from the body
     var totalArray = reactions.slice(0);
     var weeklyArray = reactions.slice(0);
@@ -66,7 +66,6 @@ exports.updateEmoji = function (emojiName, increment) {
   logger.logMessage('Updating: '+emojiName+' by: '+ increment);
   getByName(emojiName, function(err, res, body) {
     var reaction = JSON.parse(body).reaction;
-    logger.logObj(JSON.parse(body));
     logger.logMessage('Reaction: '+reaction);
     if (reaction==null) {
       //No existing emoji, insert a new one
