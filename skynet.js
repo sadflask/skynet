@@ -17,6 +17,10 @@ var lastUpdateTime = Date.now();
 var cachedEmojis = [];
 var cachedCounts = [];
 
+let dev = (process.argv[2]==='dev');
+
+requester.setAddress(dev);
+
 bot.on('ready', function (evt) {
     logger.logMessage('Connected');
     logger.logMessage('Logged in as: '+bot.user.username + ' - (' + bot.user.id + ')');
@@ -33,6 +37,15 @@ bot.on('ready', function (evt) {
 bot.on('message', function(msg) {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `!`
+    if(dev) {
+      if (msg.guild.id!=='249487189623308288') {
+        return;
+      }
+    } else {
+      if (msg.guild.id!=='262860303044182019') {
+        return;
+      }
+    }
     if (msg.content.substring(0, 1) == '!') {
         var args = msg.content.substring(1).split(' ');
         var cmd = args[0];
@@ -47,7 +60,7 @@ bot.on('message', function(msg) {
                 msg.channel.send(utils.getUptime());
             break;
             case 'stats':
-              if ((Date.now()-timeOfPrint)>1000*60*5) {//Every 5 mins
+              if ((Date.now()-timeOfPrint)>1000*5) {//Every 5 mins
                 requester.getAndPrint(printer.printStats, sorter,msg.channel);
                 timeOfPrint = Date.now();
               } else {
@@ -55,10 +68,13 @@ bot.on('message', function(msg) {
               }
             break;
             case 'all':
-                requester.getAndPrint(printer.printAll, sorter,msg.channel);
+                requester.getAndPrint(printer.printAll, sorter, msg.channel);
             break;
             case 'week':
-                requester.getAndPrint(printer.printWeekly, sorter,msg.channel);
+                requester.getAndPrint(printer.printWeekly, sorter, msg.channel);
+            break;
+            case 'week':
+                requester.getAndPrint(printer.printChanges, sorter, msg.channel);
             break;
             case 'force':
               msg.channel.send('USING THE FORCE, LUKE');

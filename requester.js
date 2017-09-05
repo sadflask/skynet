@@ -2,10 +2,17 @@ var request = require('request');
 var querystring = require("querystring");
 var logger = require('./util/consolelogger');
 
+let address = 'http://localhost:4500/api/reactions/';
+
+exports.setAddress = function(dev) {
+  if (dev === true) {
+    address = 'http://localhost:4501/api/reactions/';
+  }
+}
 //Query the db for this emoji, uses GET request
 getByName = function(emojiName, callback) {
   const options = {
-    url: 'http://localhost:4500/api/reactions/'+emojiName
+    url: address+emojiName
   };
   const req = request.get(options, callback);
 }
@@ -13,7 +20,7 @@ getByName = function(emojiName, callback) {
 //Called to increment emoji, uses PUT request
 putByName = function (reaction) {
   const options = {
-    url: 'http://localhost:4500/api/reactions/'+reaction.emoji,
+    url: address+reaction.emoji,
     body: {
       emoji: reaction.emoji,
       lastWeek: reaction.lastWeek,
@@ -32,7 +39,7 @@ putByName = function (reaction) {
 //Does a general get call on db then executes callback
 exports.getAll = function(callback) {
   const options = {
-    url: 'http://localhost:4500/api/reactions/'
+    url: address
   };
   const req = request.get(options, callback);
 }
@@ -91,7 +98,7 @@ exports.updateEmoji = function (emojiName, increment) {
 //Triggered by adding a new emoji, adds it to the db using POST
 exports.newEmoji = function (emojiName, callback) {
   const options = {
-    url: 'http://localhost:4500/api/reactions/',
+    url: address,
     body: {emoji:emojiName},
     json: true
   };
@@ -101,7 +108,7 @@ exports.newEmoji = function (emojiName, callback) {
 //Removes a reaction from the db using DELETE.
 exports.deleteEmoji = function (emojiName, callback) {
   const options = {
-    url: 'http://localhost:4500/api/reactions/'+emojiName,
+    url: address+emojiName,
     json: true
   };
   const req = request.delete(options, callback);
@@ -109,7 +116,7 @@ exports.deleteEmoji = function (emojiName, callback) {
 
 exports.deleteAll = function () {
   const options = {
-    url: 'http://localhost:4500/api/reactions/',
+    url: address,
     json: true
   };
   const req = request.delete(options, function (error, response, body) {
@@ -129,7 +136,6 @@ exports.changeWeek = function () {
       reaction.thisWeek = 0;
       putByName(reaction);
     });
-  })
-  //emoji.lastWeek = emoji.thisWeek & emoji.thisWeek=0;
+  });
 
 }

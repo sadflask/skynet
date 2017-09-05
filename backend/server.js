@@ -4,8 +4,12 @@ var config = require('config');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-var port = process.env.PORT || 4500;
-
+let dev = (process.argv[2]==='dev');
+if (dev) {
+  var port = process.env.PORT || 4501;
+} else {
+  var port = process.env.PORT || 4500;
+}
 mongoose.connect(config.get('DBHost'));
 console.log("Mongodb location: " +config.DBHost);
 app.use(function(req, res, next) {
