@@ -7,6 +7,7 @@ const requester = require("./requester.js");
 const sorter = require('./util/sorting.js');
 const init = require('./util/init.js');
 const schedule = require('node-schedule');
+const help = require('./util/help.js');
 
 // Initialize Discord Bot
 var bot = new Discord.Client({});
@@ -80,9 +81,9 @@ bot.on('message', function(msg) {
               msg.channel.send('USING THE FORCE, LUKE');
               //Updates all emojis in database.
               force();
-
             break;
-            // Just add any case commands if you want to..
+            case 'help':
+              msg.channel.send(help.help());
          }
      }
 });
