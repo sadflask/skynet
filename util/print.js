@@ -1,3 +1,5 @@
+const format = require('./format');
+
 exports.printStats = function(allTime, weekly, changes) {
   let output="SKYNET BOT STATS: \n\
   \n\n:crown: MOST USED REACTIONS (ALL TIME):\n";
@@ -28,16 +30,15 @@ exports.printStats = function(allTime, weekly, changes) {
   output+="\n\n:chart_with_upwards_trend: TRENDING REACTIONS:\n";
   for(var i=0;i<3;i++) {
     curr = changes[i];
-    output+=" " + curr.emoji  + " ("+curr.thisWeek+" uses)\
-    :point_up_2: "+((curr.thisWeek-curr.lastWeek)*100/curr.lastWeek)+"%\n";
+    output+=" " + curr.emoji  + " ("+curr.thisWeek+" uses)"+
+    format.format((curr.thisWeek-curr.lastWeek)*100/curr.lastWeek);
   }
 
   output+="\n:chart_with_downwards_trend: DYING REACTIONS:\n";
   for(var i=changes.length-1;i>changes.length-4;i--) {
     curr = changes[i];
-    output+=" " + curr.emoji  + " ("+curr.thisWeek+" uses)\
-    :point_down: "+((curr.thisWeek-curr.lastWeek)*100/curr.lastWeek)+"%\n";
-  }
+    output+=" " + curr.emoji  + " ("+curr.thisWeek+" uses)"+
+    format.format((curr.thisWeek-curr.lastWeek)*100/curr.lastWeek);  }
   return output;
 }
 
@@ -70,6 +71,22 @@ exports.printWeekly = function(allTime, weekly) {
         if (curr.thisWeek<10) {output+="0";}
         if (curr.thisWeek<100) {output+="0";}
         output+=curr.thisWeek+"\` ";
+      }
+    }
+    output+="\n";
+  }
+  return output;
+}
+
+exports.printChanges = function(allTime, weekly, changes) {
+  let output="SKYNET BOT STATS (LONG): \n\
+  \nMOST USED REACTIONS (WEEKLY):\n";
+  for(var i=0;i<changes.length;i+=4) {
+    for(var j=i;j<i+4;j++) {
+      if(j<changes.length) {
+        curr = changes[j];
+        output+=" " + curr.emoji  + " \`";
+        output+=(curr.thisWeek-curr.lastWeek)*100/curr.lastWeek+'%\`';
       }
     }
     output+="\n";

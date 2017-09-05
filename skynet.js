@@ -7,6 +7,7 @@ const requester = require("./requester.js");
 const sorter = require('./util/sorting.js');
 const init = require('./util/init.js');
 const schedule = require('node-schedule');
+const help = require('./util/help.js');
 
 // Initialize Discord Bot
 var bot = new Discord.Client({});
@@ -16,6 +17,10 @@ var lastUpdateTime = Date.now();
 
 var cachedEmojis = [];
 var cachedCounts = [];
+
+let dev = (process.argv[2]==='dev');
+
+requester.setAddress(dev);
 
 bot.on('ready', function (evt) {
     logger.logMessage('Connected');
@@ -31,8 +36,17 @@ bot.on('ready', function (evt) {
     //init.initEmojis(requester, bot.guilds[0]);
 });
 bot.on('message', function(msg) {
-    // Our bot needs to know if it will execute a command
-    // It will listen for messages that will start with `!`
+  // Our bot needs to know if it will execute a command
+  // It will listen for messages that will start with `!`
+  if(dev) {
+      if (msg.guild.id!='249487189623308288') {
+        return;
+      }
+    } else {
+      if (msg.guild.id!='262860303044182019') {
+        return;
+      }
+    }
     if (msg.content.substring(0, 1) == '!') {
         var args = msg.content.substring(1).split(' ');
         var cmd = args[0];
@@ -47,7 +61,7 @@ bot.on('message', function(msg) {
                 msg.channel.send(utils.getUptime());
             break;
             case 'stats':
-              if ((Date.now()-timeOfPrint)>1000*60*5) {//Every 5 mins
+              if ((Date.now()-timeOfPrint)>1000*5) {//Every 5 mins
                 requester.getAndPrint(printer.printStats, sorter,msg.channel);
                 timeOfPrint = Date.now();
               } else {
@@ -55,18 +69,22 @@ bot.on('message', function(msg) {
               }
             break;
             case 'all':
-                requester.getAndPrint(printer.printAll, sorter,msg.channel);
+                requester.getAndPrint(printer.printAll, sorter, msg.channel);
             break;
             case 'week':
-                requester.getAndPrint(printer.printWeekly, sorter,msg.channel);
+                requester.getAndPrint(printer.printWeekly, sorter, msg.channel);
+            break;
+            case 'change':
+                requester.getAndPrint(printer.printChanges, sorter, msg.channel);
             break;
             case 'force':
               msg.channel.send('USING THE FORCE, LUKE');
               //Updates all emojis in database.
               force();
-
             break;
-            // Just add any case commands if you want to..
+            case 'help':
+              msg.channel.send(help.help());
+            break;
          }
      }
 });
