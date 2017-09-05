@@ -36,14 +36,14 @@ bot.on('ready', function (evt) {
     //init.initEmojis(requester, bot.guilds[0]);
 });
 bot.on('message', function(msg) {
-    // Our bot needs to know if it will execute a command
-    // It will listen for messages that will start with `!`
-    if(dev) {
-      if (msg.guild.id!=='249487189623308288') {
+  // Our bot needs to know if it will execute a command
+  // It will listen for messages that will start with `!`
+  if(dev) {
+      if (msg.guild.id!='249487189623308288') {
         return;
       }
     } else {
-      if (msg.guild.id!=='262860303044182019') {
+      if (msg.guild.id!='262860303044182019') {
         return;
       }
     }
@@ -84,6 +84,7 @@ bot.on('message', function(msg) {
             break;
             case 'help':
               msg.channel.send(help.help());
+            break;
          }
      }
 });
