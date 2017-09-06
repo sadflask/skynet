@@ -60,8 +60,8 @@ bot.on('message', function(msg) {
             case 'uptime':
                 msg.channel.send(utils.getUptime());
             break;
-            case 'stats':
-              if ((Date.now()-timeOfPrint)>1000*5) {//Every 5 mins
+            case 'stats': 
+              if (((Date.now()-timeOfPrint)>1000*60*5)||dev) {//Every 5 mins
                 requester.getAndPrint(printer.printStats, sorter,msg.channel);
                 timeOfPrint = Date.now();
               } else {

@@ -30,15 +30,16 @@ exports.printStats = function(allTime, weekly, changes) {
   output+="\n\n:chart_with_upwards_trend: TRENDING REACTIONS:\n";
   for(var i=0;i<3;i++) {
     curr = changes[i];
-    output+=" " + curr.emoji  + " ("+curr.thisWeek+" uses)"+
+    output+=" " + curr.emoji  + format.formatChange(curr.thisWeek-curr.lastWeek)+
     format.format((curr.thisWeek-curr.lastWeek)*100/curr.lastWeek);
   }
 
   output+="\n:chart_with_downwards_trend: DYING REACTIONS:\n";
   for(var i=changes.length-1;i>changes.length-4;i--) {
     curr = changes[i];
-    output+=" " + curr.emoji  + " ("+curr.thisWeek+" uses)"+
-    format.format((curr.thisWeek-curr.lastWeek)*100/curr.lastWeek);  }
+    output+=" " + curr.emoji  + format.formatChange(curr.thisWeek-curr.lastWeek)+
+    format.format((curr.thisWeek-curr.lastWeek)*100/curr.lastWeek);
+  }
   return output;
 }
 
@@ -81,12 +82,33 @@ exports.printWeekly = function(allTime, weekly) {
 exports.printChanges = function(allTime, weekly, changes) {
   let output="SKYNET BOT STATS (LONG): \n\
   \nMOST USED REACTIONS (WEEKLY):\n";
+  let maxLength = 0;
+  for(var i=0;i<changes.length;i++) { //Iterate forwards to find max + value
+    curr=changes[i];
+    let percentage=(curr.thisWeek-curr.lastWeek)*100/curr.lastWeek;
+    if(isFinite(percentage)) {
+      if((Math.round(percentage)+'').length>maxLength) {
+        maxLength = (Math.round(percentage)+'').length;
+        break;
+      }
+    }
+  }
+  for(var i=changes.length-1;i>=0;i--) { //Iterate back to find max - value
+    curr=changes[i];
+    let percentage=(curr.thisWeek-curr.lastWeek)*100/curr.lastWeek;
+    if(isFinite(percentage)) {
+      if((Math.round(percentage)+'').length>maxLength) {
+        maxLength = (Math.round(percentage)+'').length;
+        break;
+      }
+    }
+  }
   for(var i=0;i<changes.length;i+=4) {
     for(var j=i;j<i+4;j++) {
       if(j<changes.length) {
         curr = changes[j];
-        output+=" " + curr.emoji  + " \`";
-        output+=(curr.thisWeek-curr.lastWeek)*100/curr.lastWeek+'%\`';
+        output+=" " + curr.emoji;
+        output+=format.longFormat((curr.thisWeek-curr.lastWeek)*100/curr.lastWeek,maxLength);
       }
     }
     output+="\n";
