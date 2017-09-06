@@ -1,3 +1,4 @@
 {
-    "DBHost": "mongodb://localhost/"
+    "DBHost": "mongodb://localhost/dev",
+    "DevHost": "mongodb://localhost/devTrue"
 }

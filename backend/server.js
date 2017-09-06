@@ -7,10 +7,11 @@ var mongoose = require('mongoose');
 let dev = (process.argv[2]==='dev');
 if (dev) {
   var port = process.env.PORT || 4501;
+  mongoose.connect(config.get('DevHost'));
 } else {
   var port = process.env.PORT || 4500;
+  mongoose.connect(config.get('DBHost'));
 }
-mongoose.connect(config.get('DBHost'));
 console.log("Mongodb location: " +config.DBHost);
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
