@@ -34,9 +34,9 @@ exports.longFormat = function(number, numPlaces) {
   }
   //Pad with 0's
 
-  let numZeros = numPlaces-numberAsString.length;
-  if(lessThanZero) { numZeros--}
-  for(var i=0;i<numZeros;i++) {
+  let numSpaces = numPlaces-numberAsString.length;
+  if(lessThanZero) { numSpaces--}
+  for(var i=0;i<numSpaces;i++) {
     numberAsString = " "+numberAsString;
   }
   if(lessThanZero) {
