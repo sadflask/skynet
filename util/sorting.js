@@ -63,4 +63,4 @@ exports.compareChange = function(reactionA, reactionB) {
   return 0;
 }
 
-exports.sort =sort;
+exports.sort = sort;
