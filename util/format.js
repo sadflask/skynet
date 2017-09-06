@@ -28,20 +28,20 @@ exports.longFormat = function(number, numPlaces) {
     //Pad with spaces
     let numSpaces = numPlaces-1;
     for(var i=0;i<numSpaces;i++) {
-      numberAsString += " ";
+      numberAsString = " "+numberAsString;
     }
-    return "\`"+numberAsString+"%\`";
+    return "\`:"+numberAsString+"%\`";
   }
   //Pad with 0's
 
   let numZeros = numPlaces-numberAsString.length;
   if(lessThanZero) { numZeros--}
   for(var i=0;i<numZeros;i++) {
-    numberAsString = "0"+numberAsString;
+    numberAsString = " "+numberAsString;
   }
   if(lessThanZero) {
     numberAsString = "-"+numberAsString;
   }
-  return "\`"+numberAsString+"%\`";
+  return "\`:"+numberAsString+"%\`";
 
 }
