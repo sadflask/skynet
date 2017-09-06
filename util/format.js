@@ -45,6 +45,3 @@ exports.longFormat = function(number, numPlaces) {
   return "\`"+numberAsString+"%\`";
 
 }
-exports.round = function(number) {
-
-}
