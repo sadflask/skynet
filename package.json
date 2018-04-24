@@ -5,11 +5,25 @@
   "main": "skynet.js",
   "author": "sadflask",
   "dependencies": {
+    "bufferutil": "^3.0.4",
     "circular-json": "^0.3.3",
     "discord.js": "^11.1.0",
-    "mongodb": "^2.2.31",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "lokijs": "^1.5.3",
+    "mongo": "^0.1.0",
+    "mongodb": "^2.2.34",
     "node-schedule": "^1.2.4",
     "querystring": "^0.2.0",
     "request": "^2.81.0"
+  },
+  "devDependencies": {
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^6.0.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
   }
 }
