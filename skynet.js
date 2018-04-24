@@ -77,7 +77,7 @@ bot.on('message', (msg) => {
       case 'force':
         msg.channel.send('USING THE FORCE, LUKE');
         // Updates all emojis in database.
-        exports.force();
+        requester.force(cachedEmojis);
         break;
       case 'help':
         msg.channel.send(help.help());

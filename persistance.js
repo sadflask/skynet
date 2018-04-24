@@ -1,5 +1,5 @@
 const Loki = require('lokijs');
-const logger = require('../util/consolelogger');
+const logger = require('./util/consolelogger');
 
 let db;
 let initialised = false;
@@ -11,8 +11,10 @@ const init = (callback) => {
 
   initialised = true;
   db = new Loki('./data/skynet.loki.json');
-
-  db.loadDatabase({}, () => {
+  logger.logMessage('Database initialised.');
+  db.loadDatabase({}, (err) => {
+    if (err) logger.logError(err);
+    logger.logMessage('Database load attempted');
     reactions = db.getCollection('reactions');
     if (!reactions) {
       reactions = db.addCollection('reactions', {

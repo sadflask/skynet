@@ -1,5 +1,5 @@
 const logger = require('./util/consolelogger');
-const storage = require('./backend/persistance.js');
+const storage = require('./persistance.js');
 
 // Get all emojis for stats, uses getAll
 exports.getAndPrint = function getAndPrint(printStats, sorter, channel) {
