@@ -21,17 +21,19 @@ const dev = (process.argv[2] === 'dev');
 bot.on('ready', () => {
   logger.logMessage('Connected');
   logger.logMessage(`Logged in as: ${bot.user.username} - (${bot.user.id})`);
-  requester.init();
-  bot.guilds.forEach((value, key) => {
-    if (key === '262860303044182019') {
-      requester.initEmojis(value);
-    }
+  requester.init(() => {
+    logger.logMessage('Running callback');
+    bot.guilds.forEach((value, key) => {
+      if (key === '262860303044182019') {
+        requester.initEmojis(value);
+      }
+    });
+    schedule.scheduleJob('30 18 * * 5', () => {
+      requester.changeWeek();
+    });
+    // init.initEmojis(requester, bot.guilds[0]);
+    return 0;
   });
-  schedule.scheduleJob('30 18 * * 5', () => {
-    requester.changeWeek();
-  });
-  // init.initEmojis(requester, bot.guilds[0]);
-  return 0;
 });
 
 bot.on('message', (msg) => {

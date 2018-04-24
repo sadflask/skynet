@@ -5,22 +5,21 @@ let db;
 let initialised = false;
 let reactions;
 
-const init = (error) => {
+const init = (callback) => {
   if (initialised === true) return;
   logger.logMessage('Running init');
 
   initialised = true;
   db = new Loki('./data/skynet.loki.json');
 
-  db.loadDatabase({}, (err) => {
-    if (err) error(err);
-
+  db.loadDatabase({}, () => {
     reactions = db.getCollection('reactions');
     if (!reactions) {
       reactions = db.addCollection('reactions', {
         indices: 'reaction',
       });
     }
+    callback();
   });
 };
 
@@ -39,7 +38,6 @@ const addNew = function addNew(emoji, count) {
 // CRUD operations
 // Create a reaction
 exports.createReaction = (reaction, count) => {
-  logger.logObj(reactions);
   // If the reaction already exists, it is likely an old reaction and should be deleted.
   const foundReaction = reactions.findOne({ reaction });
   if (foundReaction != null) {
