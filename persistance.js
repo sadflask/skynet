@@ -10,7 +10,7 @@ const init = (callback) => {
   logger.logMessage('Running init');
 
   initialised = true;
-  db = new Loki('./data/skynet.loki.json');
+  db = new Loki('.\\data\\skynet.loki.json');
   logger.logMessage('Database initialised.');
   db.loadDatabase({}, (err) => {
     if (err) logger.logError(err);
